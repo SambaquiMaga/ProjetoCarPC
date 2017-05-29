@@ -28,16 +28,17 @@
 const int pinGPS = 2;
 const int pinOne = 3;
 const int pinTwo = 4;
-int count = 0;
+unsigned long timeOne = 0;
+unsigned long timeTwo = 0;
 
 void setup() {
   Serial.begin(9600);
   Serial1.begin(9600);
   Keyboard.begin();
   pinMode(pinGPS, OUTPUT);
+  digitalWrite(pinGPS, HIGH);
   pinMode(pinOne, INPUT);
-  pinMode(pinTwo, INPUT);
-  digitalWrite(pinGPS, HIGH); 
+  pinMode(pinTwo, INPUT);   
 }
 
 void loop() {
@@ -52,21 +53,15 @@ void loop() {
 
   if (digitalRead(pinOne) == HIGH) {
     Keyboard.press(KEY_LEFT_ALT);
-    delay(100);
+    delay(10);
     Keyboard.press(KEY_TAB);
-    delay(100);
-    Keyboard.release(KEY_TAB);    
-    delay(100);
-    while(count < 30) {
-      if (digitalRead(pinTwo) == HIGH) {
-        Keyboard.press(KEY_TAB);
-        delay(100);
-        Keyboard.release(KEY_TAB);
-        count = 0;        
-      } else {
-        delay(100);
-        count++;
-      }
-    }
-  }  
+    delay(10);
+    Keyboard.release(KEY_TAB);
+    timeOne = millis() + 2000;
+  }
+
+  if (timeOne && timeOne < millis()) {
+    Keyboard.releaseAll();    
+    timeOne = 0;
+  }
 }
