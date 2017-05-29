@@ -1,3 +1,5 @@
+#include <Keyboard.h>
+
 /*
   SerialPassthrough sketch
 
@@ -24,15 +26,22 @@
 */
 
 const int pinGPS = 2;
+const int pinOne = 3;
+const int pinTwo = 4;
+int count = 0;
 
 void setup() {
   Serial.begin(9600);
   Serial1.begin(9600);
-  pinMode(pinGPS, INPUT);
+  Keyboard.begin();
+  pinMode(pinGPS, OUTPUT);
+  pinMode(pinOne, INPUT);
+  pinMode(pinTwo, INPUT);
   digitalWrite(pinGPS, HIGH); 
 }
 
 void loop() {
+  
   if (Serial.available()) {      // If anything comes in Serial (USB),
     Serial1.write(Serial.read());   // read it and send it out Serial1 (pins 0 & 1)
   }
@@ -40,4 +49,24 @@ void loop() {
   if (Serial1.available()) {     // If anything comes in Serial1 (pins 0 & 1)
     Serial.write(Serial1.read());   // read it and send it out Serial (USB)
   }
+
+  if (digitalRead(pinOne) == HIGH) {
+    Keyboard.press(KEY_LEFT_ALT);
+    delay(100);
+    Keyboard.press(KEY_TAB);
+    delay(100);
+    Keyboard.release(KEY_TAB);    
+    delay(100);
+    while(count < 30) {
+      if (digitalRead(pinTwo) == HIGH) {
+        Keyboard.press(KEY_TAB);
+        delay(100);
+        Keyboard.release(KEY_TAB);
+        count = 0;        
+      } else {
+        delay(100);
+        count = count++;
+      }
+    }
+  }  
 }
