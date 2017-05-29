@@ -65,7 +65,7 @@ void loop() {
         count = 0;        
       } else {
         delay(100);
-        count = count++;
+        count++;
       }
     }
   }  
