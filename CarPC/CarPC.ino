@@ -41,7 +41,7 @@ void setup() {
   pinMode(pinTwo, INPUT);   
 }
 
-void loop() {
+void loop() { 
   
   if (Serial.available()) {      // If anything comes in Serial (USB),
     Serial1.write(Serial.read());   // read it and send it out Serial1 (pins 0 & 1)
@@ -53,11 +53,17 @@ void loop() {
 
   if (digitalRead(pinOne) == HIGH) {
     Keyboard.press(KEY_LEFT_ALT);
-    delay(10);
+    delay(100);
     Keyboard.press(KEY_TAB);
-    delay(10);
+    delay(100);
     Keyboard.release(KEY_TAB);
     timeOne = millis() + 2000;
+  }
+
+  if (digitalRead(pinTwo) {
+    Keyboard.press(KEY_TAB);
+    delay(100);
+    Keyboard.release(KEY_TAB);    
   }
 
   if (timeOne && timeOne < millis()) {
