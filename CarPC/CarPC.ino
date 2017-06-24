@@ -1,35 +1,12 @@
 #include <Keyboard.h>
 
-/*
-  SerialPassthrough sketch
-
-  Some boards, like the Arduino 101, the MKR1000, Zero, or the Micro,
-  have one hardware serial port attached to Digital pins 0-1, and a
-  separate USB serial port attached to the IDE Serial Monitor.
-  This means that the "serial passthrough" which is possible with
-  the Arduino UNO (commonly used to interact with devices/shields that
-  require configuration via serial AT commands) will not work by default.
-
-  This sketch allows you to  emulate the serial passthrough behaviour.
-  Any text you type in the IDE Serial monitor will be written
-  out to the serial port on Digital pins 0 and 1, and vice-versa.
-
   On the 101, MKR1000, Zero, and Micro, "Serial" refers to the USB Serial port
-  attached to the Serial Monitor, and "Serial1" refers to the hardware
-  serial port attached to pins 0 and 1. This sketch will emulate Serial passthrough
-  using those two Serial ports on the boards mentioned above,
-  but you can change these names to connect any two serial ports on a board
-  that has multiple ports.
-
-   Created 23 May 2016
-   by Erik Nyquist
-*/
-
 const int pinGPS = 2;
-const int pinOne = 3;
-const int pinTwo = 4;
-unsigned long timeOne = 0;
-unsigned long timeTwo = 0;
+const int pinSwitch = 3;
+const int pinLeft = 4;
+const int pinRight = 5;
+unsigned long timeSwitch = 0;
+unsigned long timeScreen = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -37,37 +14,93 @@ void setup() {
   Keyboard.begin();
   pinMode(pinGPS, OUTPUT);
   digitalWrite(pinGPS, HIGH);
-  pinMode(pinOne, INPUT);
-  pinMode(pinTwo, INPUT);   
+  pinMode(pinSwitch, INPUT);
+  pinMode(pinLeft, INPUT); 
+  pinMode(pinRight, INPUT);  
 }
 
 void loop() { 
-  
-  if (Serial.available()) {      // If anything comes in Serial (USB),
-    Serial1.write(Serial.read());   // read it and send it out Serial1 (pins 0 & 1)
+
+//////////////////////////////////
+// SerialPassthrough sketch
+// Created 23 May 2016 by Erik Nyquist
+//  
+  if (Serial.available()) {      
+    Serial1.write(Serial.read());   
   }
 
-  if (Serial1.available()) {     // If anything comes in Serial1 (pins 0 & 1)
-    Serial.write(Serial1.read());   // read it and send it out Serial (USB)
+  if (Serial1.available()) {     
+    Serial.write(Serial1.read());  
+  }
+//////////////////////////////////
+
+  if (!digitalRead(pinSwitch)) {
+    if (!timeSwitch) {
+      Keyboard.releaseAll(); 
+      Keyboard.press(KEY_LEFT_GUI);
+      delay(100);
+      Keyboard.press(KEY_TAB);
+      delay(100);
+      Keyboard.release(KEY_TAB);
+      timeSwitch = millis() + 2000;
+    } else {
+        Keyboard.releaseAll();    
+        timeSwitch = 0;
+      }
   }
 
-  if (digitalRead(pinOne) == HIGH) {
-    Keyboard.press(KEY_LEFT_ALT);
-    delay(100);
-    Keyboard.press(KEY_TAB);
-    delay(100);
-    Keyboard.release(KEY_TAB);
-    timeOne = millis() + 2000;
+  if (digitalRead(pinLeft) != digitalRead(pinRight)) {
+    if (timeSwitch) {        
+      Keyboard.press(KEY_TAB);
+      delay(100);
+      Keyboard.release(KEY_TAB); 
+      timeSwitch = millis() + 2000; 
+    } else {
+        if (!timeScreen) {
+          Keyboard.releaseAll(); 
+          Keyboard.press(KEY_LEFT_GUI);
+          delay(100);
+          timeScreen = millis() + 2000;
+        } else {
+            if (!digitalRead(pinLeft)) {
+               Keyboard.press(KEY_RIGHT_ARROW);
+               Keyboard.release(KEY_RIGHT_ARROW);
+               Keyboard.press(KEY_RIGHT_ARROW);
+               Keyboard.release(KEY_RIGHT_ARROW);
+               Keyboard.press(KEY_RIGHT_ARROW);
+               Keyboard.release(KEY_RIGHT_ARROW);               
+               Keyboard.press(KEY_UP_ARROW);
+               Keyboard.release(KEY_UP_ARROW);
+               Keyboard.press(KEY_UP_ARROW);
+               Keyboard.release(KEY_UP_ARROW);
+               delay(100);
+               timeScreen = millis() + 2000;             
+            } else {
+               Keyboard.press(KEY_LEFT_ARROW);
+               Keyboard.release(KEY_LEFT_ARROW);
+               Keyboard.press(KEY_LEFT_ARROW);
+               Keyboard.release(KEY_LEFT_ARROW);
+               Keyboard.press(KEY_LEFT_ARROW);
+               Keyboard.release(KEY_LEFT_ARROW); 
+               Keyboard.press(KEY_UP_ARROW);
+               Keyboard.release(KEY_UP_ARROW);
+               Keyboard.press(KEY_UP_ARROW);
+               Keyboard.release(KEY_UP_ARROW);
+               delay(100);
+               timeScreen = millis() + 2000;
+              }
+          }
+      }  
   }
 
-  if (digitalRead(pinTwo) {
-    Keyboard.press(KEY_TAB);
-    delay(100);
-    Keyboard.release(KEY_TAB);    
-  }
-
-  if (timeOne && timeOne < millis()) {
+  if (timeSwitch && timeSwitch < millis()) {
     Keyboard.releaseAll();    
-    timeOne = 0;
+    timeSwitch = 0;
+  }
+
+  if (timeScreen && timeScreen < millis()) {
+    Keyboard.releaseAll();    
+    timeScreen = 0;
   }
 }
+
