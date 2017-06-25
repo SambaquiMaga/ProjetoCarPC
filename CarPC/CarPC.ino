@@ -68,27 +68,11 @@ void loop() {
         if (digitalRead(pinLeft)) {
           Keyboard.press(KEY_RIGHT_ARROW);
           Keyboard.release(KEY_RIGHT_ARROW);
-          Keyboard.press(KEY_RIGHT_ARROW);
-          Keyboard.release(KEY_RIGHT_ARROW);
-          Keyboard.press(KEY_RIGHT_ARROW);
-          Keyboard.release(KEY_RIGHT_ARROW);
-          Keyboard.press(KEY_UP_ARROW);
-          Keyboard.release(KEY_UP_ARROW);
-          Keyboard.press(KEY_UP_ARROW);
-          Keyboard.release(KEY_UP_ARROW);
           delay(100);
           timeScreen = millis() + 2000;
         } else {
           Keyboard.press(KEY_LEFT_ARROW);
-          Keyboard.release(KEY_LEFT_ARROW);
-          Keyboard.press(KEY_LEFT_ARROW);
-          Keyboard.release(KEY_LEFT_ARROW);
-          Keyboard.press(KEY_LEFT_ARROW);
-          Keyboard.release(KEY_LEFT_ARROW);
-          Keyboard.press(KEY_UP_ARROW);
-          Keyboard.release(KEY_UP_ARROW);
-          Keyboard.press(KEY_UP_ARROW);
-          Keyboard.release(KEY_UP_ARROW);
+          Keyboard.release(KEY_LEFT_ARROW);          
           delay(100);
           timeScreen = millis() + 2000;
         }
@@ -102,6 +86,9 @@ void loop() {
   }
 
   if (timeScreen && timeScreen < millis()) {
+    Keyboard.press(KEY_UP_ARROW);
+    Keyboard.press(KEY_UP_ARROW);
+    Keyboard.press(KEY_UP_ARROW);
     Keyboard.releaseAll();
     timeScreen = 0;
   }
