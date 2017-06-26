@@ -6,7 +6,6 @@ const int pinLeft = 4;
 const int pinRight = 5;
 const int pinKeyboard = 6;
 unsigned long timeSwitch = 0;
-unsigned long timeScreen = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -39,58 +38,36 @@ void loop() {
 
   if (!digitalRead(pinSwitch)) {
     if (!timeSwitch) {
-      Keyboard.releaseAll();
       Keyboard.press(KEY_LEFT_GUI);
-      delay(100);
       Keyboard.press(KEY_TAB);
-      delay(100);
-      Keyboard.release(KEY_TAB);
+      Keyboard.releaseAll();
+      delay(200);
       timeSwitch = millis() + 2000;
     } else {
+      Keyboard.press('Space');
       Keyboard.releaseAll();
       timeSwitch = 0;
     }
   }
 
   if (digitalRead(pinLeft) != digitalRead(pinRight)) {
-    if (timeSwitch) {
-      Keyboard.press(KEY_TAB);
-      delay(100);
-      Keyboard.release(KEY_TAB);
+    if (!digitalRead(pinRight)) {
+      Keyboard.press(KEY_RIGHT_ARROW);
+      Keyboard.release(KEY_RIGHT_ARROW);
+      delay(200);
       timeSwitch = millis() + 2000;
     } else {
-      if (!timeScreen) {
-        Keyboard.releaseAll();
-        Keyboard.press(KEY_LEFT_GUI);
-        delay(100);
-        timeScreen = millis() + 2000;
-      } else {
-        if (digitalRead(pinLeft)) {
-          Keyboard.press(KEY_RIGHT_ARROW);
-          Keyboard.release(KEY_RIGHT_ARROW);
-          delay(100);
-          timeScreen = millis() + 2000;
-        } else {
-          Keyboard.press(KEY_LEFT_ARROW);
-          Keyboard.release(KEY_LEFT_ARROW);          
-          delay(100);
-          timeScreen = millis() + 2000;
-        }
-      }
+      Keyboard.press(KEY_LEFT_ARROW);
+      Keyboard.release(KEY_LEFT_ARROW);
+      delay(200);      
+      timeSwitch = millis() + 2000;
     }
   }
 
   if (timeSwitch && timeSwitch < millis()) {
+    Keyboard.press('Space');
     Keyboard.releaseAll();
     timeSwitch = 0;
-  }
-
-  if (timeScreen && timeScreen < millis()) {
-    Keyboard.press(KEY_UP_ARROW);
-    Keyboard.press(KEY_UP_ARROW);
-    Keyboard.press(KEY_UP_ARROW);
-    Keyboard.releaseAll();
-    timeScreen = 0;
   }
 }
 
