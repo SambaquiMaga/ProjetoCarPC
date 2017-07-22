@@ -1,11 +1,16 @@
 #include <Keyboard.h>
 
+// seleção dos pinos do Leonardo.
 const int pinGPS = 2;
 const int pinSwitch = 3;
 const int pinLeft = 4;
 const int pinRight = 5;
-const int pinKeyboard = 6;
-unsigned long timeSwitch = 0;
+const int pinKeyOFF = 6;
+
+// variáveis de estado.
+bool stateLeft = false;
+bool stateRight = false;
+int timeControl = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -16,7 +21,7 @@ void setup() {
   pinMode(pinSwitch, INPUT_PULLUP);
   pinMode(pinLeft, INPUT_PULLUP);
   pinMode(pinRight, INPUT_PULLUP);
-  pinMode(pinKeyboard, INPUT_PULLUP);
+  pinMode(pinKeyOFF, INPUT_PULLUP); // para interromper o loop em caso de perda de controle. Ligar o pino no GND.
 }
 
 void loop() {
@@ -34,40 +39,51 @@ void loop() {
   }
   //////////////////////////////////
 
-  while (!digitalRead(pinKeyboard));
-
-  if (!digitalRead(pinSwitch)) {
-    if (!timeSwitch) {
-      Keyboard.press(KEY_LEFT_GUI);
-      Keyboard.press(KEY_TAB);
-      Keyboard.releaseAll();
-      delay(200);
-      timeSwitch = millis() + 2000;
-    } else {
-      Keyboard.press('Space');
-      Keyboard.releaseAll();
-      timeSwitch = 0;
-    }
-  }
+  while (!digitalRead(pinKeyOFF));
 
   if (digitalRead(pinLeft) != digitalRead(pinRight)) {
-    if (!digitalRead(pinRight)) {
-      Keyboard.press(KEY_RIGHT_ARROW);
-      Keyboard.release(KEY_RIGHT_ARROW);
-      delay(200);
-      timeSwitch = millis() + 2000;
+    if (!digitalRead(pinLeft)) {
+      if (stateRight) {
+        Keyboard.releaseAll();
+        stateRight = false;
+      }
+      if (stateLeft) {
+        Keyboard.press(KEY_TAB);
+        delay(200);
+      } else {
+        Keyboard.press(KEY_LEFT_ALT);
+        Keyboard.press(KEY_TAB);
+        delay(200);
+        stateLeft = true;
+      }
     } else {
-      Keyboard.press(KEY_LEFT_ARROW);
-      Keyboard.release(KEY_LEFT_ARROW);
-      delay(200);      
-      timeSwitch = millis() + 2000;
+      if (stateLeft) {
+        Keyboard.releaseAll();
+        stateLeft = false;
+      }
+      if (stateRight) {
+        Keyboard.press(KEY_LEFT_ARROW);
+        delay(200);
+
+      } else {
+        Keyboard.press(KEY_LEFT_GUI);
+        Keyboard.press(KEY_LEFT_SHIFT);
+        Keyboard.press(KEY_LEFT_ARROW);
+        delay(200);
+        stateLeft = true;
+      }
     }
+    timeControl = 1;
   }
 
-  if (timeSwitch && timeSwitch < millis()) {
-    Keyboard.press('Space');
+  if (timeControl) {
+    timeControl++;
+  }
+
+  if (!digitalRead(pinSwitch) || timeControl > 2000) {
+    stateLeft = false;
+    stateRight = false;
     Keyboard.releaseAll();
-    timeSwitch = 0;
+    timeControl = 0;
   }
 }
-
