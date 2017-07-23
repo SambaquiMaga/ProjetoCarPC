@@ -49,10 +49,12 @@ void loop() {
       }
       if (stateLeft) {
         Keyboard.press(KEY_TAB);
+        Keyboard.release(KEY_TAB);
         delay(200);
       } else {
         Keyboard.press(KEY_LEFT_ALT);
         Keyboard.press(KEY_TAB);
+        Keyboard.release(KEY_TAB);
         delay(200);
         stateLeft = true;
       }
@@ -63,12 +65,14 @@ void loop() {
       }
       if (stateRight) {
         Keyboard.press(KEY_LEFT_ARROW);
+        Keyboard.release(KEY_LEFT_ARROW);
         delay(200);
 
       } else {
         Keyboard.press(KEY_LEFT_GUI);
         Keyboard.press(KEY_LEFT_SHIFT);
         Keyboard.press(KEY_LEFT_ARROW);
+        Keyboard.release(KEY_LEFT_ARROW);
         delay(200);
         stateLeft = true;
       }
